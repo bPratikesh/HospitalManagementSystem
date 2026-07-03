@@ -1,6 +1,7 @@
 package com.doctorpatient.DocPatientProject.controller;
 
-import com.doctorpatient.DocPatientProject.entity.User;
+import com.doctorpatient.DocPatientProject.dto.UserRequestDto;
+import com.doctorpatient.DocPatientProject.dto.UserResponseDto;
 import com.doctorpatient.DocPatientProject.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -8,36 +9,35 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/user")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping("/create")
-    public User createUser(@RequestBody User user){
-        return userService.createUser(user);
+    public UserResponseDto createUser(@RequestBody UserRequestDto userRequestDto){
+        return userService.createUser(userRequestDto);
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id){
+    public UserResponseDto getUserById(@PathVariable Long id){
         return userService.getUserById(id);
     }
 
     @GetMapping("/getAll")
-    public List<User> getAllUser(){
+    public List<UserResponseDto> getAllUser(){
         return userService.getAllUsers();
     }
 
     @PutMapping("/update/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user){
-        return userService.updateUser(id, user);
+    public UserResponseDto updateUser(@PathVariable Long id, @RequestBody UserRequestDto userRequestDto){
+        return userService.updateUser(id, userRequestDto);
     }
 
     @DeleteMapping("/delete/{id}")
-    public String deleteUser(@PathVariable Long id){
+    public String deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return "User Deleted Successfully with id "+id + "!!!";
+        return "User Deleted Successfully with id " + id + "!!!";
     }
-
 }

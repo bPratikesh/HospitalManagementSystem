@@ -1,6 +1,7 @@
 package com.doctorpatient.DocPatientProject.controller;
 
-import com.doctorpatient.DocPatientProject.entity.Patient;
+import com.doctorpatient.DocPatientProject.dto.PatientRequestDto;
+import com.doctorpatient.DocPatientProject.dto.PatientResponseDto;
 import com.doctorpatient.DocPatientProject.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -8,29 +9,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/patient")
+@RequestMapping("/patient")
 @RequiredArgsConstructor
 public class PatientController {
 
     private final PatientService patientService;
+
     @PostMapping("/create/{userId}")
-    public Patient createPatient(@RequestBody Patient patient, @PathVariable Long userId) {
-        return patientService.createPatient(patient, userId);
+    public PatientResponseDto createPatient(@RequestBody PatientRequestDto patientRequestDto, @PathVariable Long userId) {
+        return patientService.createPatient(patientRequestDto, userId);
     }
 
     @GetMapping("/{id}")
-    public Patient getPatientById(@PathVariable Long id) {
+    public PatientResponseDto getPatientById(@PathVariable Long id) {
         return patientService.getPatientById(id);
     }
 
     @GetMapping("/getAll")
-    public List<Patient> getAllPatients() {
+    public List<PatientResponseDto> getAllPatients() {
         return patientService.getAllPatients();
     }
 
     @PutMapping("/update/{id}")
-    public Patient updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
-        return patientService.updatePatient(id, patient);
+    public PatientResponseDto updatePatient(@PathVariable Long id, @RequestBody PatientRequestDto patientRequestDto) {
+        return patientService.updatePatient(id, patientRequestDto);
     }
 
     @DeleteMapping("/delete/{id}")

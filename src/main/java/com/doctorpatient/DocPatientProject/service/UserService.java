@@ -1,45 +1,64 @@
 package com.doctorpatient.DocPatientProject.service;
 
+import com.doctorpatient.DocPatientProject.dto.UserRequestDto;
+import com.doctorpatient.DocPatientProject.dto.UserResponseDto;
 import com.doctorpatient.DocPatientProject.entity.User;
 import com.doctorpatient.DocPatientProject.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepo userRepo;
+    private final ModelMapper modelMapper;
 
-    public User createUser(User user){
-        return userRepo.save(user);
+    public UserResponseDto createUser(UserRequestDto userRequestDto) {
+
+        User user = modelMapper.map(userRequestDto, User.class);
+        User savedUser = userRepo.save(user);
+        return modelMapper.map(savedUser, UserResponseDto.class);
     }
 
-    public User getUserById(Long id){
-        return userRepo.findById(id).orElseThrow(()->
-                new RuntimeException("User is not present with id: "+id));
+    public UserResponseDto getUserById(Long id) {
+
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User is not present with id: " + id));
+        return modelMapper.map(user, UserResponseDto.class);
     }
 
-    public List<User> getAllUsers(){
-        return userRepo.findAll();
+    public List<UserResponseDto> getAllUsers() {
+
+        return userRepo.findAll()
+                .stream()
+                .map(user -> modelMapper.map(user, UserResponseDto.class))
+                .collect(Collectors.toList());
     }
 
-    public User updateUser(Long id, User user){
+    public UserResponseDto updateUser(Long id, UserRequestDto userRequestDto) {
 
-        User existingUser = userRepo.findById(id).orElseThrow(()->
-                new RuntimeException("User is not present with id: "+id));
+        User existingUser = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User is not present with id: " + id));
 
-        if (user.getEmail() != null) existingUser.setEmail(user.getEmail());
-        if (user.getName() != null) existingUser.setName(user.getName());
-        if (user.getPassword() != null) existingUser.setPassword(user.getPassword());
-
-        return userRepo.save(existingUser);
+        if (userRequestDto.getEmail() != null)
+            existingUser.setEmail(userRequestDto.getEmail());
+        if (userRequestDto.getName() != null)
+            existingUser.setName(userRequestDto.getName());
+        if (userRequestDto.getPassword() != null)
+            existingUser.setPassword(userRequestDto.getPassword());
+        User updatedUser = userRepo.save(existingUser);
+        return modelMapper.map(updatedUser, UserResponseDto.class);
     }
 
-    public void deleteUser(Long id){
-        User existingUser = userRepo.findById(id).orElseThrow(()->
-                new RuntimeException("User is not present with id: "+id));
+    public void deleteUser(Long id) {
+
+        User existingUser = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User is not present with id: " + id));
         userRepo.delete(existingUser);
     }
 

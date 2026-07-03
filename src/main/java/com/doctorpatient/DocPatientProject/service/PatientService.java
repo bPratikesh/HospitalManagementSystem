@@ -1,56 +1,75 @@
 package com.doctorpatient.DocPatientProject.service;
 
+import com.doctorpatient.DocPatientProject.dto.PatientRequestDto;
+import com.doctorpatient.DocPatientProject.dto.PatientResponseDto;
 import com.doctorpatient.DocPatientProject.entity.Patient;
 import com.doctorpatient.DocPatientProject.entity.User;
 import com.doctorpatient.DocPatientProject.repository.PatientRepo;
 import com.doctorpatient.DocPatientProject.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PatientService {
+
     private final PatientRepo patientRepo;
     private final UserRepo userRepo;
+    private final ModelMapper modelMapper;
 
-    public Patient createPatient(Patient patient, Long userId) {
+    public PatientResponseDto createPatient(PatientRequestDto patientRequestDto, Long userId) {
 
         User user = userRepo.findById(userId).orElseThrow(() ->
-                        new RuntimeException("User not found with id: " + userId));
+                new RuntimeException("User not found with id: " + userId));
+
+        Patient patient = modelMapper.map(patientRequestDto, Patient.class);
         patient.setUser(user);
-        return patientRepo.save(patient);
+        Patient savedPatient = patientRepo.save(patient);
+        return modelMapper.map(savedPatient, PatientResponseDto.class);
     }
 
-    public Patient getPatientById(Long id) {
-        return patientRepo.findById(id).orElseThrow(() ->
-                        new RuntimeException("Patient not found with id: " + id));
+    public PatientResponseDto getPatientById(Long id) {
+
+        Patient patient = patientRepo.findById(id).orElseThrow(() ->
+                new RuntimeException("Patient not found with id: " + id));
+        return modelMapper.map(patient, PatientResponseDto.class);
     }
 
-    public List<Patient> getAllPatients() {
-        return patientRepo.findAll();
+    public List<PatientResponseDto> getAllPatients() {
+
+        return patientRepo.findAll()
+                .stream()
+                .map(patient -> modelMapper.map(patient, PatientResponseDto.class))
+                .collect(Collectors.toList());
     }
 
-    public Patient updatePatient(Long id, Patient patient) {
+    public PatientResponseDto updatePatient(Long id, PatientRequestDto patientRequestDto) {
 
         Patient existingPatient = patientRepo.findById(id).orElseThrow(() ->
-                        new RuntimeException("Patient not found with id: " + id));
+                new RuntimeException("Patient not found with id: " + id));
+        if (patientRequestDto.getPatientName() != null)
+            existingPatient.setPatientName(patientRequestDto.getPatientName());
 
-        if (patient.getPatientName() != null)
-            existingPatient.setPatientName(patient.getPatientName());
-        if (patient.getAge() != null)
-            existingPatient.setAge(patient.getAge());
-        if (patient.getGender() != null)
-            existingPatient.setGender(patient.getGender());
-        if (patient.getBloodGroup() != null)
-            existingPatient.setBloodGroup(patient.getBloodGroup());
+        if (patientRequestDto.getAge() != null)
+            existingPatient.setAge(patientRequestDto.getAge());
 
-        return patientRepo.save(existingPatient);
+        if (patientRequestDto.getGender() != null)
+            existingPatient.setGender(patientRequestDto.getGender());
+
+        if (patientRequestDto.getBloodGroup() != null)
+            existingPatient.setBloodGroup(patientRequestDto.getBloodGroup());
+        Patient updatedPatient = patientRepo.save(existingPatient);
+        return modelMapper.map(updatedPatient, PatientResponseDto.class);
     }
 
     public void deletePatient(Long id) {
-        Patient patient = getPatientById(id);
+
+        Patient patient = patientRepo.findById(id).orElseThrow(() ->
+                new RuntimeException("Patient not found with id: " + id));
         patientRepo.delete(patient);
     }
 }
