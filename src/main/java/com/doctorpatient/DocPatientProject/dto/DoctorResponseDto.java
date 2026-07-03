@@ -13,5 +13,6 @@ public class DoctorResponseDto {
     private String speciality;
     private Double consultationFee;
     private UserResponseDto user;
+    private Double walletBalance;
 
 }

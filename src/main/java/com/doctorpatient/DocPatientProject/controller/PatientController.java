@@ -3,6 +3,7 @@ package com.doctorpatient.DocPatientProject.controller;
 import com.doctorpatient.DocPatientProject.dto.PatientRequestDto;
 import com.doctorpatient.DocPatientProject.dto.PatientResponseDto;
 import com.doctorpatient.DocPatientProject.service.PatientService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class PatientController {
     private final PatientService patientService;
 
     @PostMapping("/create/{userId}")
-    public PatientResponseDto createPatient(@RequestBody PatientRequestDto patientRequestDto, @PathVariable Long userId) {
+    public PatientResponseDto createPatient(@Valid @RequestBody PatientRequestDto patientRequestDto, @PathVariable Long userId) {
         return patientService.createPatient(patientRequestDto, userId);
     }
 
@@ -31,7 +32,7 @@ public class PatientController {
     }
 
     @PutMapping("/update/{id}")
-    public PatientResponseDto updatePatient(@PathVariable Long id, @RequestBody PatientRequestDto patientRequestDto) {
+    public PatientResponseDto updatePatient(@PathVariable Long id, @Valid @RequestBody PatientRequestDto patientRequestDto) {
         return patientService.updatePatient(id, patientRequestDto);
     }
 

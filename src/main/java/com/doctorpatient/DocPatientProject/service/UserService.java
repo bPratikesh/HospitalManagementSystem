@@ -3,6 +3,7 @@ package com.doctorpatient.DocPatientProject.service;
 import com.doctorpatient.DocPatientProject.dto.UserRequestDto;
 import com.doctorpatient.DocPatientProject.dto.UserResponseDto;
 import com.doctorpatient.DocPatientProject.entity.User;
+import com.doctorpatient.DocPatientProject.exception.ResourceNotFoundException;
 import com.doctorpatient.DocPatientProject.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -28,7 +29,7 @@ public class UserService {
     public UserResponseDto getUserById(Long id) {
 
         User user = userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User is not present with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User is not present with id: " + id));
         return modelMapper.map(user, UserResponseDto.class);
     }
 
@@ -43,7 +44,7 @@ public class UserService {
     public UserResponseDto updateUser(Long id, UserRequestDto userRequestDto) {
 
         User existingUser = userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User is not present with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User is not found with id: " + id));
 
         if (userRequestDto.getEmail() != null)
             existingUser.setEmail(userRequestDto.getEmail());
@@ -58,7 +59,7 @@ public class UserService {
     public void deleteUser(Long id) {
 
         User existingUser = userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User is not present with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User is not present with id: " + id));
         userRepo.delete(existingUser);
     }
 

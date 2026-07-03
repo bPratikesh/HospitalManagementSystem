@@ -3,6 +3,7 @@ package com.doctorpatient.DocPatientProject.controller;
 import com.doctorpatient.DocPatientProject.dto.AppointmentRequestDto;
 import com.doctorpatient.DocPatientProject.dto.AppointmentResponseDto;
 import com.doctorpatient.DocPatientProject.service.AppointmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @PostMapping("/patient/{patientId}/doctor/{doctorId}")
-    public AppointmentResponseDto createAppointment(@PathVariable Long patientId, @PathVariable Long doctorId, @RequestBody AppointmentRequestDto appointmentRequestDto){
+    public AppointmentResponseDto createAppointment(@PathVariable Long patientId, @PathVariable Long doctorId,@Valid @RequestBody AppointmentRequestDto appointmentRequestDto){
         return appointmentService.createAppointment(patientId, doctorId, appointmentRequestDto);
     }
 

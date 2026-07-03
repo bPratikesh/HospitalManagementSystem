@@ -5,6 +5,8 @@ import com.doctorpatient.DocPatientProject.dto.PrescriptionResponseDto;
 import com.doctorpatient.DocPatientProject.entity.Appointment;
 import com.doctorpatient.DocPatientProject.entity.Prescription;
 import com.doctorpatient.DocPatientProject.entity.enums.AppointmentStatus;
+import com.doctorpatient.DocPatientProject.exception.BadRequestException;
+import com.doctorpatient.DocPatientProject.exception.ResourceNotFoundException;
 import com.doctorpatient.DocPatientProject.repository.AppointmentRepo;
 import com.doctorpatient.DocPatientProject.repository.PrescriptionRepo;
 import jakarta.transaction.Transactional;
@@ -28,14 +30,14 @@ public class PrescriptionService {
     public PrescriptionResponseDto createPrescription(Long appointmentId, PrescriptionRequestDto prescriptionRequestDto){
 
         Appointment appointment = appointmentRepo.findById(appointmentId)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
 
         if(appointment.getStatus() == AppointmentStatus.CANCELLED){
-            throw new RuntimeException("Cannot prescribe for cancelled appointment.");
+            throw new BadRequestException("Cannot prescribe for cancelled appointment.");
         }
 
         if(appointment.getStatus() == AppointmentStatus.COMPLETED){
-            throw new RuntimeException("Prescription already created.");
+            throw new BadRequestException("Prescription already created.");
         }
 
         Prescription prescription = modelMapper.map(prescriptionRequestDto, Prescription.class);

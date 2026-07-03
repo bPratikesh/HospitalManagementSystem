@@ -26,5 +26,6 @@ public class Patient {
     @OneToMany(mappedBy = "patient")
     @JsonIgnore
     private List<Appointment> appointments;
+    private Double walletBalance;
 
 }

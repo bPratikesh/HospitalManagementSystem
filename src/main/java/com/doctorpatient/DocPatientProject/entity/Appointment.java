@@ -1,6 +1,7 @@
 package com.doctorpatient.DocPatientProject.entity;
 
 import com.doctorpatient.DocPatientProject.entity.enums.AppointmentStatus;
+import com.doctorpatient.DocPatientProject.entity.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -35,4 +36,6 @@ public class Appointment {
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 }

@@ -6,6 +6,9 @@ import com.doctorpatient.DocPatientProject.entity.Appointment;
 import com.doctorpatient.DocPatientProject.entity.Doctor;
 import com.doctorpatient.DocPatientProject.entity.Patient;
 import com.doctorpatient.DocPatientProject.entity.enums.AppointmentStatus;
+import com.doctorpatient.DocPatientProject.entity.enums.PaymentStatus;
+import com.doctorpatient.DocPatientProject.exception.BadRequestException;
+import com.doctorpatient.DocPatientProject.exception.ResourceNotFoundException;
 import com.doctorpatient.DocPatientProject.repository.AppointmentRepo;
 import com.doctorpatient.DocPatientProject.repository.DoctorRepo;
 import com.doctorpatient.DocPatientProject.repository.PatientRepo;
@@ -28,15 +31,16 @@ public class AppointmentService {
     public AppointmentResponseDto createAppointment(Long patientId, Long doctorId, AppointmentRequestDto appointmentRequestDto){
 
         Doctor doctor = doctorRepo.findById(doctorId).orElseThrow(()->
-                new RuntimeException("Doctor not found with id: "+doctorId));
+                new ResourceNotFoundException("Doctor not found with id: "+doctorId));
 
         Patient patient = patientRepo.findById(patientId).orElseThrow(()->
-                new RuntimeException("Patient not found with id: "+patientId));
+                new ResourceNotFoundException("Patient not found with id: "+patientId));
 
         Appointment appointment = modelMapper.map(appointmentRequestDto, Appointment.class);
         appointment.setDoctor(doctor);
         appointment.setPatient(patient);
         appointment.setStatus(AppointmentStatus.BOOKED);
+        appointment.setPaymentStatus(PaymentStatus.PENDING);
         Appointment savedAppointment = appointmentRepo.save(appointment);
         return modelMapper.map(savedAppointment, AppointmentResponseDto.class);
     }
@@ -44,7 +48,7 @@ public class AppointmentService {
     public AppointmentResponseDto getAppointmentById(Long id){
 
         Appointment appointment = appointmentRepo.findById(id).orElseThrow(()->
-                new RuntimeException("Appointment not found with id: "+ id));
+                new ResourceNotFoundException("Appointment not found with id: "+ id));
         return modelMapper.map(appointment, AppointmentResponseDto.class);
     }
 
@@ -73,7 +77,7 @@ public class AppointmentService {
             throw new RuntimeException("Completed appointment cannot be cancelled.");
         }
         if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
-            throw new RuntimeException("Appointment is already cancelled.");
+            throw new BadRequestException("Appointment is already cancelled.");
         }
         appointment.setStatus(AppointmentStatus.CANCELLED);
         return appointmentRepo.save(appointment);
@@ -83,7 +87,7 @@ public class AppointmentService {
 
         Patient patient = patientRepo.findById(patientId)
                 .orElseThrow(() ->
-                        new RuntimeException("Patient not found with id: " + patientId));
+                        new ResourceNotFoundException("Patient not found with id: " + patientId));
         return appointmentRepo.findByPatientId(patient.getId())
                 .stream()
                 .map(appointment -> modelMapper.map(appointment, AppointmentResponseDto.class))

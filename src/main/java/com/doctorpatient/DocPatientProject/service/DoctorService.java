@@ -4,6 +4,7 @@ import com.doctorpatient.DocPatientProject.dto.DoctorRequestDto;
 import com.doctorpatient.DocPatientProject.dto.DoctorResponseDto;
 import com.doctorpatient.DocPatientProject.entity.Doctor;
 import com.doctorpatient.DocPatientProject.entity.User;
+import com.doctorpatient.DocPatientProject.exception.ResourceNotFoundException;
 import com.doctorpatient.DocPatientProject.repository.DoctorRepo;
 import com.doctorpatient.DocPatientProject.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +25,11 @@ public class DoctorService {
     public DoctorResponseDto createDoctor(DoctorRequestDto doctorRequestDto, Long userId) {
 
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
         Doctor doctor = modelMapper.map(doctorRequestDto, Doctor.class);
         doctor.setUser(user);
+        doctor.setWalletBalance(0.0);
         Doctor savedDoctor = doctorRepo.save(doctor);
         return modelMapper.map(savedDoctor, DoctorResponseDto.class);
     }
@@ -35,7 +37,7 @@ public class DoctorService {
     public DoctorResponseDto getDoctorById(Long id) {
 
         Doctor doctor = doctorRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id: " + id));
         return modelMapper.map(doctor, DoctorResponseDto.class);
     }
 
@@ -50,7 +52,7 @@ public class DoctorService {
     public DoctorResponseDto updateDoctor(Long id, DoctorRequestDto doctorRequestDto) {
 
         Doctor existingDoctor = doctorRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id: " + id));
 
         if (doctorRequestDto.getDoctorName() != null)
             existingDoctor.setDoctorName(doctorRequestDto.getDoctorName());
@@ -71,7 +73,7 @@ public class DoctorService {
     public void deleteDoctor(Long id) {
 
         Doctor doctor = doctorRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id: " + id));
         doctorRepo.delete(doctor);
     }
 
