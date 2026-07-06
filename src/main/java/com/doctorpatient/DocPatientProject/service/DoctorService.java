@@ -1,5 +1,6 @@
 package com.doctorpatient.DocPatientProject.service;
 
+import com.doctorpatient.DocPatientProject.dto.DoctorCardResponseDto;
 import com.doctorpatient.DocPatientProject.dto.DoctorRequestDto;
 import com.doctorpatient.DocPatientProject.dto.DoctorResponseDto;
 import com.doctorpatient.DocPatientProject.entity.Doctor;
@@ -75,6 +76,13 @@ public class DoctorService {
         Doctor doctor = doctorRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id: " + id));
         doctorRepo.delete(doctor);
+    }
+
+    public List<DoctorCardResponseDto> getDoctorsForPatients() {
+        List<Doctor> doctors = doctorRepo.findAll();
+        return doctors.stream()
+                .map(doctor -> modelMapper.map(doctor, DoctorCardResponseDto.class))
+                .toList();
     }
 
 }

@@ -45,4 +45,11 @@ public class AppointmentController {
     public List<AppointmentResponseDto> getAppointmentsByPatient(@PathVariable Long patientId) {
         return appointmentService.getAppointmentsByPatient(patientId);
     }
+
+    @GetMapping("/doctor/{doctorId}")
+    public List<AppointmentResponseDto> getAppointmentsByDoctor(
+            @PathVariable Long doctorId) {
+
+        return appointmentService.getAppointmentsByDoctor(doctorId);
+    }
 }

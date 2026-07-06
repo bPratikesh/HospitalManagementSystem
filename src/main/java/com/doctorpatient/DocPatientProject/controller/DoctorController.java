@@ -1,5 +1,6 @@
 package com.doctorpatient.DocPatientProject.controller;
 
+import com.doctorpatient.DocPatientProject.dto.DoctorCardResponseDto;
 import com.doctorpatient.DocPatientProject.dto.DoctorRequestDto;
 import com.doctorpatient.DocPatientProject.dto.DoctorResponseDto;
 import com.doctorpatient.DocPatientProject.service.DoctorService;
@@ -40,6 +41,10 @@ public class DoctorController {
     public String deleteDoctor(@PathVariable Long id) {
         doctorService.deleteDoctor(id);
         return "Doctor deleted successfully with id: " + id + "!!!";
+    }
+    @GetMapping("/cards")
+    public List<DoctorCardResponseDto> getDoctorsForPatients() {
+        return doctorService.getDoctorsForPatients();
     }
 
 }

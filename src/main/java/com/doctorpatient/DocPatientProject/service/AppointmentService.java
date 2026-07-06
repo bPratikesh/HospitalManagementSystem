@@ -94,4 +94,16 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    public List<AppointmentResponseDto> getAppointmentsByDoctor(Long doctorId) {
+
+        Doctor doctor = doctorRepo.findById(doctorId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Doctor not found with id: " + doctorId));
+
+        return appointmentRepo.findByDoctorId(doctor.getId())
+                .stream()
+                .map(appointment -> modelMapper.map(appointment, AppointmentResponseDto.class))
+                .collect(Collectors.toList());
+    }
+
 }

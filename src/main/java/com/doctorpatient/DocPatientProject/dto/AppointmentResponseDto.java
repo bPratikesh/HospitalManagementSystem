@@ -1,6 +1,7 @@
 package com.doctorpatient.DocPatientProject.dto;
 
 import com.doctorpatient.DocPatientProject.entity.enums.AppointmentStatus;
+import com.doctorpatient.DocPatientProject.entity.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,5 +20,6 @@ public class AppointmentResponseDto {
     private DoctorResponseDto doctor;
     private PatientResponseDto patient;
     private AppointmentStatus status;
+    private PaymentStatus paymentStatus;
 
 }

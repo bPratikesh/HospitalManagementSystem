@@ -57,5 +57,15 @@ public class PrescriptionService {
                 .map(prescription -> modelMapper.map(prescription, PrescriptionResponseDto.class))
                 .collect(Collectors.toList());
     }
+    public PrescriptionResponseDto getPrescriptionByAppointment(Long appointmentId) {
+
+        Prescription prescription = prescriptionRepo
+                .findByAppointmentId(appointmentId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Prescription not found for appointment id: " + appointmentId));
+
+        return modelMapper.map(prescription, PrescriptionResponseDto.class);
+    }
 
 }

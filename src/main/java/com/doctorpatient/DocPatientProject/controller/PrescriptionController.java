@@ -25,5 +25,11 @@ public class PrescriptionController {
     public List<PrescriptionResponseDto> getAllPrescriptionsByPatient(@PathVariable Long patientId) {
         return prescriptionService.getAllPrescriptionsByPatient(patientId);
     }
+    @GetMapping("/appointment/{appointmentId}")
+    public PrescriptionResponseDto getPrescriptionByAppointment(
+            @PathVariable Long appointmentId) {
+
+        return prescriptionService.getPrescriptionByAppointment(appointmentId);
+    }
 
 }
