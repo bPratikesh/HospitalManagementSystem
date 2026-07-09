@@ -30,6 +30,7 @@ public class AuthService {
         }
 
         User user = modelMapper.map(dto, User.class);
+        user.setName(dto.getDoctorName());
         user.setRole(Role.DOCTOR);
 
         User savedUser = userRepo.save(user);
@@ -48,6 +49,7 @@ public class AuthService {
         }
 
         User user = modelMapper.map(dto, User.class);
+        user.setName(dto.getPatientName());
         user.setRole(Role.PATIENT);
 
         User savedUser = userRepo.save(user);

@@ -9,8 +9,8 @@ import lombok.Setter;
 public class RegisterDoctorRequestDto {
 
     // User info
-    @NotBlank(message = "name is required")
-    private String name;
+//    @NotBlank(message = "name is required")
+//    private String name;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Please enter a valid email address")
