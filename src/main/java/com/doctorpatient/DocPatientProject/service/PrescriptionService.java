@@ -5,6 +5,7 @@ import com.doctorpatient.DocPatientProject.dto.PrescriptionResponseDto;
 import com.doctorpatient.DocPatientProject.entity.Appointment;
 import com.doctorpatient.DocPatientProject.entity.Prescription;
 import com.doctorpatient.DocPatientProject.entity.enums.AppointmentStatus;
+import com.doctorpatient.DocPatientProject.entity.enums.PaymentStatus;
 import com.doctorpatient.DocPatientProject.exception.BadRequestException;
 import com.doctorpatient.DocPatientProject.exception.ResourceNotFoundException;
 import com.doctorpatient.DocPatientProject.repository.AppointmentRepo;
@@ -52,7 +53,11 @@ public class PrescriptionService {
 
     public List<PrescriptionResponseDto> getAllPrescriptionsByPatient(Long patientId) {
 
-        return prescriptionRepo.findByAppointmentPatientId(patientId)
+        return prescriptionRepo
+                .findByAppointmentPatientIdAndAppointmentPaymentStatus(
+                        patientId,
+                        PaymentStatus.PAID
+                )
                 .stream()
                 .map(prescription -> modelMapper.map(prescription, PrescriptionResponseDto.class))
                 .collect(Collectors.toList());
@@ -65,6 +70,11 @@ public class PrescriptionService {
                         new ResourceNotFoundException(
                                 "Prescription not found for appointment id: " + appointmentId));
 
+        if (prescription.getAppointment().getPaymentStatus() != PaymentStatus.PAID) {
+            throw new BadRequestException(
+                    "Please complete the consultation payment to view the prescription."
+            );
+        }
         return modelMapper.map(prescription, PrescriptionResponseDto.class);
     }
 

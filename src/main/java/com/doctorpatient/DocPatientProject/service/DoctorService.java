@@ -84,5 +84,18 @@ public class DoctorService {
                 .map(doctor -> modelMapper.map(doctor, DoctorCardResponseDto.class))
                 .toList();
     }
+    public List<DoctorResponseDto> searchDoctors(String name, String speciality) {
+
+        if (name != null && name.isBlank()) {
+            name = null;
+        }
+        if (speciality != null && speciality.isBlank()) {
+            speciality = null;
+        }
+        return doctorRepo.searchDoctors(name, speciality)
+                .stream()
+                .map(doctor -> modelMapper.map(doctor, DoctorResponseDto.class))
+                .collect(Collectors.toList());
+    }
 
 }

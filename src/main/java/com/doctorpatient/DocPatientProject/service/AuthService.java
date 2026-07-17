@@ -13,6 +13,8 @@ import com.doctorpatient.DocPatientProject.repository.PatientRepo;
 import com.doctorpatient.DocPatientProject.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,9 @@ public class AuthService {
     private final DoctorRepo doctorRepo;
     private final PatientRepo patientRepo;
     private final ModelMapper modelMapper;
+
+    private static final int MAX_FAILED_ATTEMPTS = 3;
+    private static final int LOCK_DURATION_HOURS = 24;
 
     public DoctorResponseDto registerDoctor(RegisterDoctorRequestDto dto) {
 
@@ -64,29 +69,63 @@ public class AuthService {
     public LoginResponseDto login(LoginRequestDto dto) {
 
         User user = userRepo.findByEmail(dto.getEmail())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Invalid Email or Password."));
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid Email or Password."));
 
-        if (!user.getPassword().equals(dto.getPassword())) {
-            throw new BadRequestException("Invalid Email or Password.");
+        // Checking if account is locked or not
+        if (Boolean.TRUE.equals(user.getAccountLocked())) {
+            LocalDateTime unlockTime = user.getLockTime().plusHours(LOCK_DURATION_HOURS);
+
+            if (LocalDateTime.now().isBefore(unlockTime)) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+
+                throw new BadRequestException("Account is locked due to multiple failed login attempts.Try again after: "
+                                + unlockTime.format(formatter)
+                );
+            } else {
+                // Automatically unlocking the profilee after 24 hours
+                user.setAccountLocked(false);
+                user.setFailedAttempts(0);
+                user.setLockTime(null);
+                userRepo.save(user);
+            }
         }
 
-        LoginResponseDto response = new LoginResponseDto();
+        // Wrong password scenario
+        if (!user.getPassword().equals(dto.getPassword())) {
+            int attempts = user.getFailedAttempts() + 1;
+            user.setFailedAttempts(attempts);
+            if (attempts >= MAX_FAILED_ATTEMPTS) {
+                user.setAccountLocked(true);
+                user.setLockTime(LocalDateTime.now());
+                userRepo.save(user);
+                throw new BadRequestException("Account locked for 24 hours due to 3 failed login attempts.");
+            } else {
+                userRepo.save(user);
+                throw new BadRequestException("Invalid password. Attempts remaining: " + (MAX_FAILED_ATTEMPTS - attempts));
+            }
+        }
 
+        // Successful login scenario
+        user.setFailedAttempts(0);
+        user.setAccountLocked(false);
+        user.setLockTime(null);
+        userRepo.save(user);
+
+        LoginResponseDto response = new LoginResponseDto();
         response.setUserId(user.getId());
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setRole(user.getRole());
 
         if (user.getRole() == Role.DOCTOR) {
-
             Doctor doctor = doctorRepo.findByUserId(user.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Doctor not found."));
+
             response.setDoctorId(doctor.getId());
         } else {
-
             Patient patient = patientRepo.findByUserId(user.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Patient not found."));
+
             response.setPatientId(patient.getId());
         }
         return response;

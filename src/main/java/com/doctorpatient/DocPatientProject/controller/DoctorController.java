@@ -46,5 +46,10 @@ public class DoctorController {
     public List<DoctorCardResponseDto> getDoctorsForPatients() {
         return doctorService.getDoctorsForPatients();
     }
+    @GetMapping("/search")
+    public List<DoctorResponseDto> searchDoctors(@RequestParam(required = false) String name,
+                                                 @RequestParam(required = false) String speciality) {
+        return doctorService.searchDoctors(name, speciality);
+    }
 
 }

@@ -2,11 +2,14 @@ package com.doctorpatient.DocPatientProject.controller;
 
 import com.doctorpatient.DocPatientProject.dto.AppointmentRequestDto;
 import com.doctorpatient.DocPatientProject.dto.AppointmentResponseDto;
+import com.doctorpatient.DocPatientProject.dto.SlotAvailabilityDto;
 import com.doctorpatient.DocPatientProject.service.AppointmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -51,5 +54,9 @@ public class AppointmentController {
             @PathVariable Long doctorId) {
 
         return appointmentService.getAppointmentsByDoctor(doctorId);
+    }
+    @GetMapping("/slots")
+    public List<SlotAvailabilityDto> getSlotAvailability( @RequestParam Long doctorId, @RequestParam LocalDate appointmentDate) {
+        return appointmentService.getSlotAvailability(doctorId, appointmentDate);
     }
 }
