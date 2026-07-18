@@ -32,9 +32,7 @@ public class AppointmentService {
     private final AppointmentRepo appointmentRepo;
     private final ModelMapper modelMapper;
 
-    public AppointmentResponseDto createAppointment(Long patientId,
-                                                    Long doctorId,
-                                                    AppointmentRequestDto appointmentRequestDto) {
+    public AppointmentResponseDto createAppointment(Long patientId,  Long doctorId, AppointmentRequestDto appointmentRequestDto) {
 
         Doctor doctor = doctorRepo.findById(doctorId)
                 .orElseThrow(() ->
@@ -113,7 +111,7 @@ public class AppointmentService {
         Patient patient = patientRepo.findById(patientId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Patient not found with id: " + patientId));
-        return appointmentRepo.findByPatientId(patient.getId())
+        return appointmentRepo.findByPatientIdOrderByAppointmentDateDescAppointmentSlotDesc(patient.getId())
                 .stream()
                 .map(appointment -> modelMapper.map(appointment, AppointmentResponseDto.class))
                 .collect(Collectors.toList());
@@ -125,7 +123,7 @@ public class AppointmentService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Doctor not found with id: " + doctorId));
 
-        return appointmentRepo.findByDoctorId(doctor.getId())
+        return appointmentRepo.findByDoctorIdOrderByAppointmentDateDescAppointmentSlotDesc(doctor.getId())
                 .stream()
                 .map(appointment -> modelMapper.map(appointment, AppointmentResponseDto.class))
                 .collect(Collectors.toList());

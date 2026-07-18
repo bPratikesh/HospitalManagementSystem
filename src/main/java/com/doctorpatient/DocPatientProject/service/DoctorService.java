@@ -1,11 +1,14 @@
 package com.doctorpatient.DocPatientProject.service;
 
 import com.doctorpatient.DocPatientProject.dto.DoctorCardResponseDto;
+import com.doctorpatient.DocPatientProject.dto.DoctorDashboardDto;
 import com.doctorpatient.DocPatientProject.dto.DoctorRequestDto;
 import com.doctorpatient.DocPatientProject.dto.DoctorResponseDto;
 import com.doctorpatient.DocPatientProject.entity.Doctor;
 import com.doctorpatient.DocPatientProject.entity.User;
+import com.doctorpatient.DocPatientProject.entity.enums.AppointmentStatus;
 import com.doctorpatient.DocPatientProject.exception.ResourceNotFoundException;
+import com.doctorpatient.DocPatientProject.repository.AppointmentRepo;
 import com.doctorpatient.DocPatientProject.repository.DoctorRepo;
 import com.doctorpatient.DocPatientProject.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ public class DoctorService {
 
     private final DoctorRepo doctorRepo;
     private final UserRepo userRepo;
+    private final AppointmentRepo appointmentRepo;
     private final ModelMapper modelMapper;
 
     public DoctorResponseDto createDoctor(DoctorRequestDto doctorRequestDto, Long userId) {
@@ -96,6 +100,27 @@ public class DoctorService {
                 .stream()
                 .map(doctor -> modelMapper.map(doctor, DoctorResponseDto.class))
                 .collect(Collectors.toList());
+    }
+
+    public DoctorDashboardDto getDashboard(Long doctorId) {
+        Doctor doctor = doctorRepo.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id: " + doctorId));
+
+        Long totalAppointments = appointmentRepo.countByDoctorId(doctorId);
+        Long bookedAppointments = appointmentRepo.countByDoctorIdAndStatus(doctorId, AppointmentStatus.BOOKED);
+        Long completedAppointments = appointmentRepo.countByDoctorIdAndStatus(doctorId, AppointmentStatus.COMPLETED);
+        Long cancelledAppointments = appointmentRepo.countByDoctorIdAndStatus(doctorId, AppointmentStatus.CANCELLED);
+        Long totalPatients = appointmentRepo.countDistinctPatients(doctorId);
+
+        DoctorDashboardDto dashboard = new DoctorDashboardDto();
+        dashboard.setTotalAppointments(totalAppointments);
+        dashboard.setBookedAppointments(bookedAppointments);
+        dashboard.setCompletedAppointments(completedAppointments);
+        dashboard.setCancelledAppointments(cancelledAppointments);
+        dashboard.setTotalPatients(totalPatients);
+        dashboard.setWalletBalance(doctor.getWalletBalance());
+
+        return dashboard;
     }
 
 }

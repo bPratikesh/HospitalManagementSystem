@@ -13,18 +13,11 @@ import java.time.LocalDate;
 public class AppointmentResponseDto {
 
     private Long id;
-
     private String symptoms;
-
     private LocalDate appointmentDate;
-
     private AppointmentSlot appointmentSlot;
-
     private DoctorResponseDto doctor;
-
     private PatientResponseDto patient;
-
     private AppointmentStatus status;
-
     private PaymentStatus paymentStatus;
 }

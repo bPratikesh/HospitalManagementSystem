@@ -1,6 +1,7 @@
 package com.doctorpatient.DocPatientProject.controller;
 
 import com.doctorpatient.DocPatientProject.dto.DoctorCardResponseDto;
+import com.doctorpatient.DocPatientProject.dto.DoctorDashboardDto;
 import com.doctorpatient.DocPatientProject.dto.DoctorRequestDto;
 import com.doctorpatient.DocPatientProject.dto.DoctorResponseDto;
 import com.doctorpatient.DocPatientProject.service.DoctorService;
@@ -50,6 +51,10 @@ public class DoctorController {
     public List<DoctorResponseDto> searchDoctors(@RequestParam(required = false) String name,
                                                  @RequestParam(required = false) String speciality) {
         return doctorService.searchDoctors(name, speciality);
+    }
+    @GetMapping("/{doctorId}/dashboard")
+    public DoctorDashboardDto getDashboard(@PathVariable Long doctorId) {
+        return doctorService.getDashboard(doctorId);
     }
 
 }

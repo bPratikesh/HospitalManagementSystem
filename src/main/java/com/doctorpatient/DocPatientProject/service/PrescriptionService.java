@@ -54,7 +54,7 @@ public class PrescriptionService {
     public List<PrescriptionResponseDto> getAllPrescriptionsByPatient(Long patientId) {
 
         return prescriptionRepo
-                .findByAppointmentPatientIdAndAppointmentPaymentStatus(
+                .findByAppointmentPatientIdAndAppointmentPaymentStatusOrderByPrescriptionDateDesc(
                         patientId,
                         PaymentStatus.PAID
                 )
