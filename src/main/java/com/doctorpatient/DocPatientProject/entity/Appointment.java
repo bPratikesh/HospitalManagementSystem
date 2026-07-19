@@ -43,4 +43,7 @@ public class Appointment {
     private AppointmentStatus status;
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+    @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private DoctorReview review;
 }
